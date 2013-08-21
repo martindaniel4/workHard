@@ -1,0 +1,14 @@
+<h2>Gimme the list</h2>
+
+<% console.log(list.items) %>
+
+<h3> Je viens de trouver <%= list.items.length %> calendriers </h3>
+
+<%
+    for(var i = 0 ; i < list.items.length ; i++) {
+    %>
+
+    <p><%= list.items[i].summary %> </p>
+
+<% } %>
+

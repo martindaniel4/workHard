@@ -41,9 +41,7 @@
 
 <script type="text/javascript">
 
-var myVar = JSON.parse('<%- count%>');
-
-console.log(myVar['Sat Jan 01 0000 00:00:00 GMT+0100']);
+var count = JSON.parse('<%- count%>');
 
 var width = 960,
     height = 136,
@@ -52,7 +50,7 @@ var width = 960,
 var day = d3.time.format("%w"),
     week = d3.time.format("%U"),
     percent = d3.format(".1%"),
-    format_hour = d3.time.format("%m/%d/%Y %H:%M"),
+    format_hour = d3.time.format("YYYY-MM-DD"),
     format_day = d3.time.format("%m/%d/%Y");
 
 var color = d3.scale.quantize()
@@ -92,19 +90,15 @@ svg.selectAll(".month")
     .attr("class", "month")
     .attr("d", monthPath);
 
-d3.csv("data/data.csv", function(csv) {
-
   var data = d3.nest()
     .key(function(d) { return format_day(format_hour.parse(d.Start)); })
     .rollup(function(d) {return d.length ; })
-    .map(csv);
+    .map(count);
 
   rect.filter(function(d) { return d.substr(0,10) in data; })
       .attr("class", function(d) { return "day " + color(data[d.substr(0,10)]); })
     .select("title")
       .text(function(d) { return d + ": " + data[d.substr(0,10)]; });
-
-});
 
 function monthPath(t0) {
   var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),

@@ -1,14 +1,65 @@
-<h2>Gimme the list</h2>
+<html>
+  <head>
 
-<% console.log(list.items) %>
+    <title>Gcal - visusalisation</title>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.css">
+    <link type="text/css" rel="stylesheet" href="css/jumbotron.css">
+    <script type="text/javascript" src="js/bootstrap.js"> </script>
+    <script type="text/javascript" src="js/d3.js"> </script>
 
-<h3> Je viens de trouver <%= list.items.length %> calendriers </h3>
+  </head>
+   <body>
 
-<%
-    for(var i = 0 ; i < list.items.length ; i++) {
-    %>
+    <div class="container">
 
-    <p><%= list.items[i].summary %> </p>
+      <div class="header">
+        <ul class="nav nav-pills pull-right">
+          <li class="active"><a href="#">Calendar list</a></li>
+        </ul>
+        <h3 class="text-muted">Work Hard</h3>
+      </div>
 
-<% } %>
+      <div class="row"> 
+		<div class="col-lg-12">
+			<h3> I just found <%= list.items.length %> calendars. Pick one to start ! </h3>
+		</div>
+      </div>
 
+      <div class="row marketing">
+        
+
+			<% for(var i = 0 ; i < list.items.length ; i++) { %>
+
+		<div class="row list">
+			<div class="col-lg-10">
+
+				<% console.log(list.items[i]);%>
+
+    			<h4 ><%= list.items[i].summary %></h4>
+    			<p><%= list.items[i].timeZone %> </p>
+    		</div>
+
+    		<div class="col-lg-2">
+    			<button type="button" class="btn btn-default" style=background-color:<%=list.items[i].backgroundColor%>;border:none;><a href= /details/<%=list.items[i].id %> style="color:white;"> Pick that one </a></button>
+    		</div>
+
+
+    	</div>
+
+			<% } %>
+
+      </div>
+
+      <div class="footer">
+        <p>&copy; Company 2013</p>
+      </div>
+
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+  </body>
+</html>

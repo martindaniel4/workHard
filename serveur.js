@@ -134,61 +134,50 @@ var tab = [],
 });
 
 
-
-app.get('/details2/:id', function(req, res) {
-
-  function fetchEventWithToken(nextPageToken){
-
-  var accessToken = req.session.access_token;
-  var google_calendar = new gcal.GoogleCalendar(accessToken);
-
-  var options = {
-
-    maxResults:2000,
-    pageToken:nextPageToken
-  }
+function fetchEventWithToken(id, google_calendar, options, tab, results){
 
   //Fetch events
-  google_calendar.events.list(req.params.id, {maxResults: options.maxResults}, function(err, events) {
-
-    console.log(events.nextPageToken);
+  google_calendar.events.list(id,options, function(err, data) {
 
     //If there is more result, call the function again...
-    if(events.nextPageToken){
+   if(data.items.length > 1 && data.nextPageToken != undefined){
 
-      console.log("----------TROP d'EVENTS--------");
+    console.log("ici !");
 
-      fetchEventWithToken(events.nextPageToken);
+      options.pageToken = data.nextPageToken;
+      console.log("fetching with token : " + data.nextPageToken);
+
+      mungeEventsData(tab, data, results);
+      fetchEventWithToken(id, google_calendar, options, tab, results);
+
+    } 
+
+    else if (data.items.length > 1 && data.nextPageToken == null) {
+
+      delete options.pageToken;
+
+      mungeEventsData(tab, data, results);
+      //fetchEventWithToken(id, google_calendar, options, tab);
+      console.log(results);
+      console.log("hit the last ");
+    } 
+
+    else {
+
+      console.log("hit the end ! ")
+
     }
 
     //Do something with events
-    console.log("---DO SOMETHING-");
-
-    // render view
-
-    renderView();
-
-  });
 
 
-  function renderView() {
 
-  res.render('welcome.ejs');
-
-  }
-
+  })
 }
 
-//Start the function
-fetchEventWithToken(null)
+function mungeEventsData(tab, data, results) {
 
-  });
-
-
-
-function getEventsData() {
-
-    events.items.forEach(function(d, i) {
+    data.items.forEach(function(d, i) {
 
       if (d.start.dateTime != undefined) {
 
@@ -211,5 +200,45 @@ function getEventsData() {
 
               });
 
+    var count = _.countBy(tab, function(d) 
+          {
+            return moment(d.date).format("YYYY-MM-DD");
+          });
+
+   results.minYear = moment(_.min(tab, function(d) {return moment(d.date)}).date).format("YYYY");
+   results.maxYear = moment(_.max(tab, function(d) {return moment(d.date)}).date).format("YYYY");
+   results.minVolume = _.min(count, function(d) {return d;});
+   results.maxVolume = _.max(count, function(d) {return d;});
+   results.count = tab.length;
 
 }
+
+
+function displayDetails(results, res) {
+
+res.render('details2.ejs',{results: JSON.stringify(results)});
+
+}
+
+
+app.get('/details2/:id', function(req, res) {
+
+
+  var options = {
+    maxResults:100,
+    singleEvents: true, 
+    timeMax: moment().subtract('years',1).format()
+  };
+
+  var tab = [],
+      results = {};
+
+  var accessToken = req.session.access_token;
+  var google_calendar = new gcal.GoogleCalendar(accessToken);
+
+  // call recursive function here
+
+//Start the function
+fetchEventWithToken(req.params.id, google_calendar, options, tab, results);
+
+  });

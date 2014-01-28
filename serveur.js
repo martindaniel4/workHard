@@ -134,13 +134,17 @@ var tab = [],
 });
 
 
-function fetchEventWithToken(id, google_calendar, options, tab, results){
+function fetchEventWithToken(id, google_calendar, options, tab, callback){
+
+  var results = {};
 
   //Fetch events
   google_calendar.events.list(id,options, function(err, data) {
 
+    console.log(err);
+
     //If there is more result, call the function again...
-   if(data.items.length > 1 && data.nextPageToken != undefined){
+   if(data.items.length > 1 && data.nextPageToken != null){
 
     console.log("ici !");
 
@@ -148,29 +152,27 @@ function fetchEventWithToken(id, google_calendar, options, tab, results){
       console.log("fetching with token : " + data.nextPageToken);
 
       mungeEventsData(tab, data, results);
-      fetchEventWithToken(id, google_calendar, options, tab, results);
+      fetchEventWithToken(id, google_calendar, options, tab, callback);
 
-    } 
-
-    else if (data.items.length > 1 && data.nextPageToken == null) {
-
-      delete options.pageToken;
-
-      mungeEventsData(tab, data, results);
-      //fetchEventWithToken(id, google_calendar, options, tab);
-      console.log(results);
-      console.log("hit the last ");
     } 
 
     else {
 
-      console.log("hit the end ! ")
+      //delete options.pageToken;
 
-    }
+      mungeEventsData(tab, data, results);
+      console.log(results);
+      console.log("hit the last ");
 
-    //Do something with events
 
+      if (typeof callback === "function") {
+    // Call it, since we have confirmed it is callable
+        callback(results);
+    } 
+      else (console.log("not a function"));
+      
 
+    } 
 
   })
 }
@@ -210,11 +212,12 @@ function mungeEventsData(tab, data, results) {
    results.minVolume = _.min(count, function(d) {return d;});
    results.maxVolume = _.max(count, function(d) {return d;});
    results.count = tab.length;
+   results.day = count;
 
 }
 
 
-function displayDetails(results, res) {
+function displayDetails(results) {
 
 res.render('details2.ejs',{results: JSON.stringify(results)});
 
@@ -225,13 +228,12 @@ app.get('/details2/:id', function(req, res) {
 
 
   var options = {
-    maxResults:100,
+    maxResults:500,
     singleEvents: true, 
     timeMax: moment().subtract('years',1).format()
   };
 
-  var tab = [],
-      results = {};
+  var tab = [];
 
   var accessToken = req.session.access_token;
   var google_calendar = new gcal.GoogleCalendar(accessToken);
@@ -239,6 +241,10 @@ app.get('/details2/:id', function(req, res) {
   // call recursive function here
 
 //Start the function
-fetchEventWithToken(req.params.id, google_calendar, options, tab, results);
+fetchEventWithToken(req.params.id, google_calendar, options, tab, function(a) {
+
+  res.render('details2.ejs',{results: JSON.stringify(a)});
+
+});
 
   });

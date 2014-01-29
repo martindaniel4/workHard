@@ -13,6 +13,7 @@
 
     <div class="container">
 
+      <div id="loading" class="alert alert-info hidden"> <strong> Hold Tight </strong> while I am collecting your calendar events. This takes few seconds.</div>
       <div class="header">
         <ul class="nav nav-pills pull-right">
           <li class="active"><a href="#">Calendar list</a></li>
@@ -50,11 +51,17 @@
       </div>
 
       <div class="footer">
-        <p>&copy; Company 2013</p>
+        <p><a href="https://twitter.com/martindaniel4">@martindaniel4</a> made with <a href="http://d3js.org/">d3</a> & <a href="http://nodejs.org/">node</a> </p>
       </div>
-
     </div> <!-- /container -->
 
+    <script type="text/javascript">
+
+      d3.selectAll(".marketing").selectAll("a").on("click",function() {d3.select("#loading").attr("class","alert alert-info show");})
+
+    </script>
+
+    
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

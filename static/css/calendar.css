@@ -20,3 +20,15 @@
 .RdYlGn .q2-11{fill:rgb(102,189,99)}
 .RdYlGn .q1-11{fill:rgb(26,152,80)}
 .RdYlGn .q0-11{fill:rgb(0,104,55)}
+
+.hidden {
+	display:none;
+}
+
+.show {
+	display:block;
+}
+
+.pad20 {
+	margin-top: 20px;
+}

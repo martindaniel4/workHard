@@ -23,7 +23,9 @@ app.configure(function() {
   app.use(passport.initialize());
   app.use(express.static(__dirname + '/static'));
 });
-app.listen(8080);
+
+var port = process.env.PORT || 8080
+app.listen(port);
 
 passport.use(new GoogleStrategy({
     clientID: config.consumer_key,
@@ -146,10 +148,7 @@ function fetchEventWithToken(id, google_calendar, options, tab, callback){
     //If there is more result, call the function again...
    if(data.items.length > 1 && data.nextPageToken != null){
 
-    console.log("ici !");
-
       options.pageToken = data.nextPageToken;
-      console.log("fetching with token : " + data.nextPageToken);
 
       mungeEventsData(tab, data, results);
       fetchEventWithToken(id, google_calendar, options, tab, callback);
@@ -161,15 +160,9 @@ function fetchEventWithToken(id, google_calendar, options, tab, callback){
       //delete options.pageToken;
 
       mungeEventsData(tab, data, results);
-      console.log(results);
       console.log("hit the last ");
 
-
-      if (typeof callback === "function") {
-    // Call it, since we have confirmed it is callable
         callback(results);
-    } 
-      else (console.log("not a function"));
       
 
     } 
@@ -214,6 +207,8 @@ function mungeEventsData(tab, data, results) {
    results.count = tab.length;
    results.day = count;
 
+   console.log("count length " + count.length);
+
 }
 
 
@@ -228,9 +223,9 @@ app.get('/details2/:id', function(req, res) {
 
 
   var options = {
-    maxResults:500,
+    maxResults:1000,
     singleEvents: true, 
-    timeMax: moment().subtract('years',1).format()
+    timeMax: moment().subtract('days',1).format()
   };
 
   var tab = [];
